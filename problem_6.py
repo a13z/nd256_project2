@@ -25,7 +25,6 @@ class LinkedList:
     def prepend(self, value):
         """ Prepend a value to the beginning of the list. """
 
-        # TODO: Write function to prepend here
         if self.head is None:
             self.head = Node(value)
             self.tail = self.head
@@ -69,14 +68,22 @@ class LinkedList:
         return out
 
 def union(llist_1, llist_2):
-    # Your Solution Here
+    """ Return a list with the union of two lists given """
+
+    if (llist_1.head is None and llist_2.head is None) or \
+            (not isinstance(llist_1, LinkedList) and not isinstance(llist_2, LinkedList)):
+        return LinkedList()
+
+    if llist_1.head is None or not isinstance(llist_1, LinkedList):
+        return sort_list(llist_2)
+
+    if llist_2.head is None or not isinstance(llist_2, LinkedList):
+        return sort_list(llist_1)
 
     sorted_list = sort_list(llist_1)
     list2 = llist_2.head
 
     while list2:
-
-        # print("list2 value", list2.value)
         sorted_list_head = sorted_list.head
         sorted_list_tail = sorted_list.tail
 
@@ -89,15 +96,9 @@ def union(llist_1, llist_2):
         # case 3 Iterate
         else:
             while sorted_list_head.next:
-                # time.sleep(2)
-                # print("sorted list ", sorted_list)
-                # print("list2 value ", list2.value)
-                # print("sorted list value ", sorted_list_head.value)
-
                 if list2.value == sorted_list_head.value:
                     list2 = list2.next
                     break
-                #if list2.value < sorted_list_head.next.value:
                 elif list2.value < sorted_list_head.next.value:
                     new_node = Node(list2.value)
                     new_node.next = sorted_list_head.next
@@ -109,21 +110,19 @@ def union(llist_1, llist_2):
     return sorted_list
 
 def intersection(llist_1, llist_2):
-    # Your Solution Here
+    """ Return a list with the intersection of two lists given """
 
     intersection_list = LinkedList()
 
+    if llist_1.head is None or llist_2.head is None \
+            or not isinstance(llist_1, LinkedList) or not isinstance(llist_2, LinkedList):
+        return intersection_list
+
     sorted_list = sort_list(llist_1)
     list2 = sort_list(llist_2).head
-    #list2 = llist_2.head
-
-    # print("Intersection of ")
-    # print("sorted list 1 ", sorted_list)
-    # print("list 2  ", llist_2)
 
     while list2:
 
-        # print("list2 value", list2.value)
         sorted_list_head = sorted_list.head
         sorted_list_tail = sorted_list.tail
 
@@ -136,10 +135,6 @@ def intersection(llist_1, llist_2):
         # case 3 Iterate
         else:
             while sorted_list_head.next and list2:
-                # time.sleep(2)
-                # print("sorted list ", sorted_list)
-                # print("list2 value ", list2.value)
-                # print("sorted list value ", sorted_list_head.value)
 
                 if list2.value == sorted_list_head.value:
                     intersection_list.append(list2.value)
@@ -152,12 +147,11 @@ def intersection(llist_1, llist_2):
                 else:
                     sorted_list_head = sorted_list_head.next
 
-        #print("Intersection list ", intersection_list)
-
     return intersection_list
 
 
 def sort_list(list):
+    """ Return a list, sorted, from a given list """
 
     sorted_list = LinkedList()
     node = list.head
@@ -166,8 +160,6 @@ def sort_list(list):
         return None
 
     while node:
-
-        # print("Inside first loop. the list to sort. Node value ", node.value)
         if sorted_list.head is None:
             sorted_list.append(node.value)
             sorted_list_head = sorted_list.head
@@ -185,9 +177,6 @@ def sort_list(list):
         # case 3 Iterate
         else:
             while sorted_list_head.next:
-                # print("sorted_list_head ", sorted_list_head)
-                # print("Inside second loop. the sorted list head value ", sorted_list_head.value)
-                # print("Inside second loop. the list node value ", node.value)
                 if node.value == sorted_list_head.value:
                     break
                 if node.value < sorted_list_head.next.value:
@@ -197,46 +186,75 @@ def sort_list(list):
                     break
                 else:
                     sorted_list_head = sorted_list_head.next
-
         node = node.next
-        # print(sorted_list)
     return sorted_list
+
+def test_function(test_case):
+    element_1 = test_case[0]
+    element_2 = test_case[1]
+    solution_union = test_case[2][0]
+    solution_intersection = test_case[2][1]
+
+    linked_list_1 = LinkedList()
+    linked_list_2 = LinkedList()
+
+    for i in element_1:
+        linked_list_1.append(i)
+
+    for i in element_2:
+        linked_list_2.append(i)
+
+    print("List 1 ", linked_list_1)
+    print("List 2 ", linked_list_2)
+
+    union_linked_list = union(linked_list_1,linked_list_2)
+    intersection_linked_list = intersection(linked_list_1, linked_list_2)
+
+    if union_linked_list.to_list() == solution_union and \
+        intersection_linked_list.to_list() == solution_intersection:
+        print("Pass")
+    else:
+        print("Failed")
 
 
 # Test case 1
-
-linked_list_1 = LinkedList()
-linked_list_2 = LinkedList()
-
-element_1 = [3,2,4,35,6,65,6,4,3,21]
-element_2 = [6,32,4,9,6,1,11,21,1]
-
-for i in element_1:
-    linked_list_1.append(i)
-
-for i in element_2:
-    linked_list_2.append(i)
-
-# sort_list(linked_list_1)
-print("Test case 1")
-
-print (union(linked_list_1,linked_list_2))
-print (intersection(linked_list_1,linked_list_2))
+element_1 = [3, 2, 4, 35, 6, 65, 6, 4, 3, 21]
+element_2 = [6, 32, 4, 9, 6, 1, 11, 21, 1]
+solution = [[1, 2, 3, 4, 6, 9, 11, 21, 32, 35, 65],[4, 6, 21]]
+test_case = [element_1, element_2, solution]
+test_function(test_case)
 
 # Test case 2
-print("Test case 2")
+element_1 = [3, 2, 4, 35, 6, 65, 6, 4, 3, 23]
+element_2 = [1, 7, 8, 9, 11, 21, 1]
+solution = [[1, 2, 3, 4, 6, 7, 8, 9, 11, 21, 23, 35, 65],[]]
+test_case = [element_1, element_2, solution]
+test_function(test_case)
 
-linked_list_3 = LinkedList()
-linked_list_4 = LinkedList()
+# Test case 3
+element_1 = [3, 2, 4, 35, 6, 65, 6, 4, 3, 23]
+element_2 = []
+solution = [[2, 3, 4, 6, 23, 35, 65],[]]
+test_case = [element_1, element_2, solution]
+test_function(test_case)
 
-element_1 = [3,2,4,35,6,65,6,4,3,23]
-element_2 = [1,7,8,9,11,21,1]
+# Test case 4
+element_1 = []
+element_2 = [1, 7, 8, 9, 11, 21, 1]
+solution = [[1, 7, 8, 9, 11, 21],[]]
+test_case = [element_1, element_2, solution]
+test_function(test_case)
 
-for i in element_1:
-    linked_list_3.append(i)
+# Test case 5
+element_1 = []
+element_2 = []
+solution = [[],[]]
+test_case = [element_1, element_2, solution]
+test_function(test_case)
 
-for i in element_2:
-    linked_list_4.append(i)
-
-print (union(linked_list_3,linked_list_4))
-print (intersection(linked_list_3,linked_list_4))
+# Test case 6
+element_1 = [3, 2, 4, 35, 6, 65, 6, 4, 3, 23]
+element_2 = ""
+solution = [[2, 3, 4, 6, 23, 35, 65],[]]
+test_case = [element_1, element_2, solution]
+test_function(test_case)
