@@ -87,7 +87,22 @@ def is_user_in_group(user, group):
 
     if group_found:
         return search_user(group_found, user)
+    else:
+        return False
 
+def test_function(test_case):
+    user = test_case[0]
+    group = test_case[1]
+    solution = test_case[2]
+
+    print("User %s is in group %s or in any of its subgroups" % (user, group) if solution else \
+              "User %s is NOT in group %s or in any of its subgroups" % (user, group))
+    if is_user_in_group(user, group) == solution:
+        print("Pass")
+    else:
+        print("Failed")
+
+# load test data set
 
 parent = Group("parent")
 child = Group("child")
@@ -97,7 +112,6 @@ child3 = Group("child3")
 sub_child = Group("subchild")
 sub_child2 = Group("subchild2")
 sub_child3 = Group("subchild3")
-sub_child4 = Group("subchild4")
 
 child_user3 = "child_user3"
 sub_child_user = "sub_child_user"
@@ -121,22 +135,37 @@ parent.add_group(child3)
 
 active_directory = ActiveDirectory(parent)
 
-# Should be True
-print(is_user_in_group("sub_child_user3", "parent"))
-print(is_user_in_group("sub_child_user3", "child"))
+# Test case 1
+user = "sub_child_user3"
+group = "parent"
+solution = True
+test_case = [user, group, solution]
+test_function(test_case)
 
-# Should be False
-print(is_user_in_group("sub_child_user3", "child2"))
-print(is_user_in_group("sub_child_user3", "child3"))
-print(is_user_in_group("sub_child_user2", "subchild"))
+# Test case 2
+user = "sub_child_user3"
+group = "child"
+solution = True
+test_case = [user, group, solution]
+test_function(test_case)
 
-# Should be True
-print(is_user_in_group("sub_child_user3", "subchild2"))
-print(is_user_in_group("sub_child_user2", "subchild2"))
+# Test case 3
+user = "sub_child_user3"
+group = "child2"
+solution = False
+test_case = [user, group, solution]
+test_function(test_case)
 
-# Should be False
-print(is_user_in_group("sub_child_user2", "subchild3"))
+# Test case 4. Passing a child as a group
+user = "sub_child_user2"
+group = "sub_child_user3"
+solution = False
+test_case = [user, group, solution]
+test_function(test_case)
 
-
-
-
+# Test case 5
+user = "sub_child_user2"
+group = "subchild"
+solution = False
+test_case = [user, group, solution]
+test_function(test_case)
