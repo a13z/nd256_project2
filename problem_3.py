@@ -60,6 +60,9 @@ def huffman_encoding(data):
     char_frequencies = {}
     encoded_data = ""
 
+    if len(data) == 0:
+        return "0", None
+
     for char in data:
         if char not in char_frequencies:
             char_frequencies[char] = 1
@@ -71,12 +74,23 @@ def huffman_encoding(data):
     while freq_list is not None:
         if len(freq_list) == 1:
             tree = Tree()
-            tree.set_root(freq_list.pop(0)[2])
-
-            traverse_tree(tree.get_root(),"")
-
-            for char in data:
-                encoded_data = encoded_data + codes[char]
+            # Case when data has more than 1 char,
+            # then freq_list only element has a third field which
+            # is the pointer to the parent node of the tree
+            if len(freq_list[0]) > 2:
+                tree.set_root(freq_list.pop(0)[2])
+                traverse_tree(tree.get_root(), "")
+                for char in data:
+                    encoded_data = encoded_data + codes[char]
+            else:
+            # Case when data contains just 1 char,
+            # then freq_list only element is unique and therefore
+            # there is only 1 node in the tree. Use 0 to encode it.
+                node = freq_list.pop(0)
+                tree.set_root(Node(node[1],node[0]))
+                traverse_tree(tree.get_root(), "")
+                for char in data:
+                    encoded_data = encoded_data + '0'
 
             return encoded_data, tree
 
@@ -87,6 +101,7 @@ def huffman_encoding(data):
         node2 = Node(lowest2[1], lowest2[0])
 
         node_sum = Node(lowest1[1] + lowest2[1], lowest1[0] + lowest2[0])
+
 
         if len(lowest1) > 2:
             node_sum.set_left_child(lowest1[2])
@@ -105,18 +120,23 @@ def huffman_encoding(data):
 
 
 def huffman_decoding(data,tree):
+    if tree is None or len(data) == 0:
+        return ""
+
     node = tree.get_root()
     decoded_data = ""
 
     for char in data:
         if char == "0":
-            node = node.get_left_child()
+            if node.has_left_child():
+                node = node.get_left_child()
             if not node.has_left_child() and not node.has_right_child():
                 decoded_data = decoded_data + node.get_data()
                 node = tree.get_root()
 
         elif char == "1":
-            node = node.get_right_child()
+            if node.has_right_child():
+                node = node.get_right_child()
             if not node.has_left_child() and not node.has_right_child():
                 decoded_data = decoded_data + node.get_data()
                 node = tree.get_root()
@@ -124,6 +144,12 @@ def huffman_decoding(data,tree):
     return decoded_data
 
 def traverse_tree(tree,code):
+
+    # if tree.get_left_child() is None and tree.get_right_child() is None:
+    #     print("There is only one node in the tree")
+    #     codes[tree.data] = '1'
+    #     return
+
     if tree.get_left_child() is None and tree.get_right_child() is None:
         codes[tree.data] = code
         return
@@ -138,20 +164,45 @@ def traverse_tree(tree,code):
         traverse_tree(tree.get_right_child(),code)
         code = code[:-1]
 
-if __name__ == "__main__":
-    codes = {}
+def test_function(test_case):
+    sentence = test_case[0]
+    solution_sentence_size = test_case[1][0]
+    solution_encoded_sentence = test_case[1][2]
+    solution_encoded_size = test_case[1][1]
 
-    a_great_sentence = "The bird is the word"
-
-    print ("The size of the data is: {}\n".format(sys.getsizeof(a_great_sentence)))
-    print ("The content of the data is: {}\n".format(a_great_sentence))
-
-    encoded_data, tree = huffman_encoding(a_great_sentence)
-
-    print ("The size of the encoded data is: {}\n".format(sys.getsizeof(int(encoded_data, base=2))))
-    print ("The content of the encoded data is: {}\n".format(encoded_data))
+    encoded_data, tree = huffman_encoding(sentence)
 
     decoded_data = huffman_decoding(encoded_data, tree)
 
-    print ("The size of the decoded data is: {}\n".format(sys.getsizeof(decoded_data)))
-    print ("The content of the encoded data is: {}\n".format(decoded_data))
+    print ("The content of the data is: {}\n".format(sentence))
+
+    if sys.getsizeof(sentence) == solution_sentence_size and \
+        encoded_data == solution_encoded_sentence and \
+        sys.getsizeof(int(encoded_data, base=2)) == solution_encoded_size and \
+        decoded_data == sentence:
+        print("Pass")
+    else:
+        print("Failed")
+
+if __name__ == "__main__":
+    codes = {}
+
+    sentence = ''
+    solution = [49, 24, '0']
+    test_case = [sentence, solution]
+    test_function(test_case)
+
+    sentence = 'a'
+    solution = [50, 24, '0']
+    test_case = [sentence, solution]
+    test_function(test_case)
+
+    sentence = 'AAAAAAAA'
+    solution = [57, 24, '00000000']
+    test_case = [sentence, solution]
+    test_function(test_case)
+
+    sentence = 'The bird is the word'
+    solution = [69, 36, '1110000100011011101010100111111001001111101010001000110101101101001111']
+    test_case = [sentence, solution]
+    test_function(test_case)
