@@ -40,12 +40,16 @@ class Blockchain:
 
     def print(self):
         head = self.head
+        counter = self.size()
         while head:
+            print("Block # ", counter)
             print("Date :", datetime.fromtimestamp(head.timestamp).isoformat())
             print("Data :", head.data)
             print("Block hash :", head.hash)
             print("Previous hash :", head.previous_hash)
+            print("")
             head = head.next
+            counter -= 1
 
     def size(self):
         """ Return the size or length of the linked list. """
@@ -58,7 +62,6 @@ class Blockchain:
             node = node.next
 
         return counter
-        pass
 
     def to_list(self):
         out = []
